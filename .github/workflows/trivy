@@ -1,0 +1,38 @@
+name: trivy_analysis
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+  schedule:
+    - cron: '29 12 * * 0'
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'python:3.6-slim-buster'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-slim-buster.sarif'
+
+      - name: 'Safe trivy-indy-node-latest.sarif'
+        uses: actions/upload-artifact@v2
+        with:
+          name: trivy-slim-buster.sarif
+          path: trivy-slim-buster.sarif
+          retention-days: 8
+          
+      # Upload works fine, but analysis fails
+      - name: Upload Trivy slim-buster scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-slim-buster.sarif'
