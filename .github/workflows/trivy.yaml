@@ -21,7 +21,7 @@ jobs:
         with:
           image-ref: 'python:3.6-slim-buster'
           format: 'template'
-          template: '@/contrib/sarif.tpl'
+          template: '@sarif_test.tpl'
           output: 'trivy-slim-buster.sarif'
 
       - name: 'Safe trivy-indy-node-latest.sarif'
